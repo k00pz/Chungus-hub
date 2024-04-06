@@ -211,7 +211,7 @@ Mainy:AddParagraph({
         Content = "Real1!11!1!!1"
     })
 
-local Dropdown = Mainy:AddDropdown("Players", {Title = "Farm Method",Values = {"Legit (Sucks)", "Blatant (hacker mode)", "Insane (need Freeze Ability)"},Multi = false,Default = 1,})
+local Dropdown = Tabs.Mainy:AddDropdown("Players", {Title = "Farm Method",Values = {"Legit (Sucks)", "Blatant (hacker mode)", "Insane (need Freeze Ability)"},Multi = false,Default = 1,})
     Dropdown:OnChanged(function(Value)
         MethodHit  = Value
     end)
