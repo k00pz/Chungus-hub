@@ -83,53 +83,36 @@ end)
 ScreenGui.Parent = player:FindFirstChild("PlayerGui")
 end
 
-function autoParry()
-local Debug = false -- Set this to true if you want my debug output.
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Players = game:GetService("Players")
-
-local Player = Players.LocalPlayer or Players.PlayerAdded:Wait()
-local Remotes = ReplicatedStorage:WaitForChild("Remotes", 9e9) -- A second argument in waitforchild what could it mean?
-local Balls = workspace:WaitForChild("Balls", 9e9)
-local function print(...) -- Debug print.
-    if Debug then
-        warn(...)
+if Sprint then
+        Player.Character.Humanoid.WalkSpeed = 70
     end
-end
-local function VerifyBall(Ball) -- Returns nil if the ball isn't a valid projectile; true if it's the right ball.
-    if typeof(Ball) == "Instance" and Ball:IsA("BasePart") and Ball:IsDescendantOf(Balls) and Ball:GetAttribute("realBall") == true then
-        return true
+    if Hate then
+        if MethodHit:find("Legit") then
+            Hit()
+        end
     end
-end
-local function IsTarget() -- Returns true if we are the current target.
-    return (Player.Character and Player.Character:FindFirstChild("Highlight"))
-end
-local function Parry() -- Parries.
-    Remotes:WaitForChild("ParryButtonPress"):Fire()
-end
-Balls.ChildAdded:Connect(function(Ball)
-    if not VerifyBall(Ball) then
-        return
-    end
-    print(`Ball Spawned: {Ball}`)
-    local OldPosition = Ball.Position
-    local OldTick = tick()
-    Ball:GetPropertyChangedSignal("Position"):Connect(function()
-        if IsTarget() then -- No need to do the math if we're not being attacked.
-            local Distance = (Ball.Position - workspace.CurrentCamera.Focus.Position).Magnitude
-            local Velocity = (OldPosition - Ball.Position).Magnitude -- Fix for .Velocity not working. Yes I got the lowest possible grade in accuplacer math.
-            print(`Distance: {Distance}\nVelocity: {Velocity}\nTime: {Distance / Velocity}`)
-            if (Distance / Velocity) <= 10 then -- Sorry for the magic number. This just works. No, you don't get a slider for this because it's 2am.
-                Parry()
+    if Loser then
+        local Ball = Baller()
+        JustHit()
+        if Ball and Player.Character:FindFirstChild("HumanoidRootPart") and Player.Character.Parent.Name == "Alive" then
+            for i=1, 50 do
+                VG.NoClip()
+                Player.Character.HumanoidRootPart.CFrame = CFrame.new(Vector3.new(Ball.Position.X, Workspace.Map:FindFirstChild('BALLSPAWN',true).Position.Y + -10, Ball.Position.Z))
             end
         end
-        if (tick() - OldTick >= 1/60) then -- Don't want it to update too quickly because my velocity implementation is aids. Yes, I tried Ball.Velocity. No, it didn't work.
-            OldTick = tick()
-            OldPosition = Ball.Position
-        end
-    end)
+    end
 end)
-end
+spawn(function()
+    while wait() and Hate do
+        pcall(function()
+            if MethodHit:find("Blatant") then
+                JustHit()
+            elseif MethodHit:find("Insane") then
+                FreezeHit()
+            end
+        end)
+    end
+end)
 
 function SwordCrateManual()
 game:GetService("ReplicatedStorage").Remote.RemoteFunction:InvokeServer("PromptPurchaseCrate", workspace.Spawn.Crates.NormalSwordCrate)
@@ -171,14 +154,10 @@ Mainy:AddParagraph({
         Content = "Real1!11!1!!1"
     })
 
-local Toggle = Mainy:AddToggle("Parry - for high end ", {Title = "Toggle Auto Parry - Best", Default = false })
-Toggle:OnChanged(function(Value)
-        getgenv().Parry = Value
-        while getgenv().Parry do
-        autoParry()
-        wait(0.3)
-        end
-end)
+local Dropdown = Mainy:AddDropdown("Players", {Title = "Farm Method",Values = {"Legit (Sucks)", "Blatant (hacker mode)", "Insane (need Freeze Ability)"},Multi = false,Default = 1,})
+    Dropdown:OnChanged(function(Value)
+        MethodHit  = Value
+    end)
 
 Mainy:AddButton({
         Title = "Ping Based Parry - Best",
